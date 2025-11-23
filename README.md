@@ -144,7 +144,6 @@
 #### 일반 채팅 (ChatGPT 기능)
 - ✅ **자유로운 채팅방 생성**: 사용자가 원할 때 새 채팅방 생성
 - ✅ **대화형 AI 상담**: 사용자 질문에 AI가 답변
-- ✅ **채팅방 제목 수정**: 대화 내용에 맞게 제목 변경
 - ✅ **채팅 목록 조회**: 마지막 메시지 미리보기 (10글자 + ...)
 - ✅ **채팅방 삭제**: Soft delete 방식
 
@@ -298,7 +297,6 @@ http://localhost:8080
 | GET | `/chat/list/{userId}` | 일반 채팅 목록 조회 |
 | POST | `/chat/create/{userId}` | 새 채팅방 생성 |
 | POST | `/chat/message` | 메시지 저장 |
-| PATCH | `/chat/{chatRoomId}/title` | 채팅방 제목 수정 |
 | DELETE | `/chat/{chatRoomId}` | 채팅방 삭제 |
 
 #### 홈 화면 API 🆕

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eum.pj_eum.mapper.homeMapper">
+
+    <!-- 오늘의 기분 저장/수정 -->
+    <insert id="insertOrUpdateMood">
+        INSERT INTO pj_user_life_data (
+            life_data_id,
+            user_id,
+            status_date,
+            mood_score,
+            mood_level,
+            total_score,
+            reg_date,
+            upd_date
+        ) VALUES (
+                     #{lifeDataId},
+                     #{userId},
+                     CURRENT_DATE,
+                     #{moodScore},
+                     #{moodLevel},
+                     #{moodScore},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
+            ON CONFLICT (user_id, status_date)
+        DO UPDATE SET
+            mood_score = #{moodScore},
+                           mood_level = #{moodLevel},
+                           total_score = EXCLUDED.mood_score,
+                           upd_date = CURRENT_TIMESTAMP
+    </insert>
+
+</mapper>

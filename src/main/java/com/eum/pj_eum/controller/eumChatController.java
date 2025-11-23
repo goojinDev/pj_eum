@@ -14,7 +14,7 @@ import java.util.List;
 
 @Tag(name = "이음 채팅 API", description = "감정 AI 측정 이음 채팅 관련 API")
 @RestController
-@RequestMapping("/eum-chat")
+@RequestMapping("/eumChat")
 @RequiredArgsConstructor
 public class eumChatController {
 

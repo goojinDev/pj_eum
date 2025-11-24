@@ -17,7 +17,9 @@
         FROM pj_user_chat_list
         WHERE user_id = #{userId}
           AND room_status = 'ACTIVE'
-        ORDER BY last_message_date DESC NULLS LAST, reg_date DESC
+        ORDER BY CASE WHEN last_message_date IS NULL THEN 1 ELSE 0 END,
+                 last_message_date DESC,
+                 reg_date DESC
     </select>
 
     <!-- 새 채팅방 생성 -->
@@ -85,6 +87,13 @@
         WHERE chat_room_id = #{chatRoomId}
     </update>
 
+    <!-- 채팅방 제목 수정 -->
+    <update id="updateRoomTitle">
+        UPDATE pj_user_chat_list
+        SET room_title = #{roomTitle},
+            upd_date = CURRENT_TIMESTAMP
+        WHERE chat_room_id = #{chatRoomId}
+    </update>
 
     <!-- 채팅방 상태 변경 -->
     <update id="updateChatRoomStatus">

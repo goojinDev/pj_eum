@@ -25,12 +25,11 @@
                      CURRENT_TIMESTAMP,
                      CURRENT_TIMESTAMP
                  )
-            ON CONFLICT (user_id, status_date)
-        DO UPDATE SET
-            mood_score = #{moodScore},
-                           mood_level = #{moodLevel},
-                           total_score = EXCLUDED.mood_score,
-                           upd_date = CURRENT_TIMESTAMP
+            ON DUPLICATE KEY UPDATE
+                                 mood_score = VALUES(mood_score),
+                                 mood_level = VALUES(mood_level),
+                                 total_score = VALUES(mood_score),
+                                 upd_date = CURRENT_TIMESTAMP
     </insert>
 
 </mapper>

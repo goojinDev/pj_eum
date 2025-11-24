@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # MariaDB 데이터베이스
+  mariadb:
+    image: mariadb:10.11
+    container_name: eum-mariadb
+    restart: always
+    environment:
+      # 루트 비밀번호
+      MYSQL_ROOT_PASSWORD: root1234
+      # 데이터베이스 이름
+      MYSQL_DATABASE: eum_db
+      # 사용자 계정
+      MYSQL_USER: eum_user
+      # 사용자 비밀번호
+      MYSQL_PASSWORD: eum1234
+      # 한글 설정
+      TZ: Asia/Seoul
+    ports:
+      # 호스트:컨테이너 포트 매핑
+      - "3306:3306"
+    volumes:
+      # DDL 자동 실행 (컨테이너 최초 실행 시)
+      - ./schema_mariadb.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      # 데이터 영구 저장
+      - mariadb-data:/var/lib/mysql
+      # MariaDB 설정 파일
+      - ./mariadb-config:/etc/mysql/conf.d:ro
+    command:
+      # 한글 인코딩 설정
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - eum-network
+
+volumes:
+  # 데이터 영구 저장 볼륨
+  mariadb-data:
+    driver: local
+
+networks:
+  # 네트워크 생성
+  eum-network:
+    driver: bridge

@@ -27,7 +27,9 @@
         FROM pj_eum_chat_list ecl
         WHERE ecl.user_id = #{userId}
           AND ecl.chat_status = 'ACTIVE'
-        ORDER BY ecl.chat_date DESC, ecl.last_message_date DESC NULLS LAST
+        ORDER BY ecl.chat_date DESC,
+            CASE WHEN ecl.last_message_date IS NULL THEN 1 ELSE 0 END,
+                 ecl.last_message_date DESC
     </select>
 
     <!-- 오늘 날짜의 이음 채팅방 조회 -->
@@ -144,7 +146,7 @@
                      #{emotionScore},
                      #{sentiment},
                      #{sentimentScore},
-                     #{keywords}::jsonb,
+                     #{keywords},
                      CURRENT_TIMESTAMP,
                      #{modelVersion}
                  )

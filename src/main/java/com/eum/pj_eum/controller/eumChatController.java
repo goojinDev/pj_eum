@@ -21,26 +21,26 @@ public class eumChatController {
     private final eumChatService eumChatService;
 
     @Operation(summary = "이음 채팅 목록 조회",
-            description = "하루 단위 이음 채팅 목록을 조회합니다. 첫 AI 질문 10글자 + ... 형태로 표시")
+            description = "이음 채팅 목록을 조회합니다. 첫 AI 질문 미리보기 제공")
     @GetMapping("/list/{userId}")
-    public ResponseEntity<List<eumChatListResponse>> getEumChatList(@PathVariable String userId) {
+    public ResponseEntity<List<eumChatListResponse>> getEumChatList(@PathVariable Long userId) {
         List<eumChatListResponse> chatList = eumChatService.getEumChatList(userId);
         return ResponseEntity.ok(chatList);
     }
 
-    @Operation(summary = "오늘의 이음 채팅방 조회/생성",
-            description = "오늘 날짜의 이음 채팅방을 조회하고, 없으면 새로 생성합니다.")
-    @PostMapping("/today/{userId}")
-    public ResponseEntity<String> getTodayEumChat(@PathVariable String userId) {
-        String eumChatId = eumChatService.getTodayEumChat(userId);
-        return ResponseEntity.ok(eumChatId);
+    @Operation(summary = "새 이음 채팅방 생성",
+            description = "새로운 이음 채팅방을 생성합니다.")
+    @PostMapping("/create/{userId}")
+    public ResponseEntity<Long> createEumChat(@PathVariable Long userId) {
+        Long eumeChatId = eumChatService.createEumChat(userId);
+        return ResponseEntity.ok(eumeChatId);
     }
 
     @Operation(summary = "이음 채팅 메시지 저장",
             description = "AI 질문 또는 사용자 답변을 저장합니다.")
     @PostMapping("/message")
-    public ResponseEntity<String> saveEumMessage(@RequestBody eumMessageSaveRequest request) {
-        String messageId = eumChatService.saveEumMessage(request);
+    public ResponseEntity<Long> saveEumMessage(@RequestBody eumMessageSaveRequest request) {
+        Long messageId = eumChatService.saveEumMessage(request);
         return ResponseEntity.ok(messageId);
     }
 
@@ -54,10 +54,9 @@ public class eumChatController {
 
     @Operation(summary = "이음 채팅 삭제",
             description = "이음 채팅방을 삭제합니다. (soft delete)")
-    @DeleteMapping("/{eumChatId}")
-    public ResponseEntity<String> deleteEumChat(@PathVariable String eumChatId) {
-        eumChatService.deleteEumChat(eumChatId);
+    @DeleteMapping("/{eumeChatId}")
+    public ResponseEntity<String> deleteEumChat(@PathVariable Long eumeChatId) {
+        eumChatService.deleteEumChat(eumeChatId);
         return ResponseEntity.ok("채팅방이 삭제되었습니다.");
     }
-
 }

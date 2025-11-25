@@ -1,16 +1,15 @@
 package com.eum.pj_eum.mapper;
 
+import com.eum.pj_eum.dto.userRegisterRequest;
 import com.eum.pj_eum.dto.userVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-import java.time.LocalDate;
 
 @Mapper
 public interface userMapper {
 
     /**
-     * 사용자 등록
+     * 사용자 등록 (AUTO_INCREMENT)
      */
     void insert(userVo user);
 
@@ -22,63 +21,35 @@ public interface userMapper {
     /**
      * 사용자 ID로 조회
      */
-    userVo findById(@Param("userId") String userId);
+    userVo findById(@Param("userId") Long userId);
 
     /**
      * 마지막 로그인 시간 업데이트
      */
-    void updateLastLoginDate(@Param("userId") String userId);
+    void updateLastLoginDate(@Param("userId") Long userId);
 
     /**
      * 로그인 실패 횟수 증가
      */
-    void increaseLoginFailCount(@Param("userId") String userId);
+    void increaseLoginFailCount(@Param("userId") Long userId);
 
     /**
      * 로그인 실패 횟수 초기화
      */
-    void resetLoginFailCount(@Param("userId") String userId);
-
-    /**
-     * 비밀번호 변경
-     */
-    void updatePassword(@Param("userId") String userId, @Param("userPw") String userPw);
+    void resetLoginFailCount(@Param("userId") Long userId);
 
     /**
      * 사용자 상태 변경
      */
-    void updateStatus(@Param("userId") String userId, @Param("userStatus") String userStatus);
-
+    void updateStatus(@Param("userId") Long userId, @Param("userStatus") String userStatus);
 
     /**
      * 프로필 이미지 업데이트
      */
-    void updateProfileImage(@Param("userId") String userId, @Param("profileImage") String profileImage);
+    void updateProfileImage(@Param("userId") Long userId, @Param("profileImage") String profileImage);
 
     /**
-     * 추가 정보 업데이트
+     * 사용자 정보 업데이트 (닉네임, 전화번호, 프로필 이미지, 테마 등)
      */
-    void updateAdditionalInfo(
-            @Param("userId") String userId,
-            @Param("nickname") String nickname,
-            @Param("groupId") String groupId,
-            @Param("birthDate") LocalDate birthDate,
-            @Param("gender") String gender,
-            @Param("phone") String phone,
-            @Param("backgroundTheme") String backgroundTheme
-    );
-
-    /**
-     * 사용자 정보 업데이트 (닉네임, 전화번호, 주소, 테마 등)
-     */
-    void updateUserInfo(
-            @Param("userId") String userId,
-            @Param("nickname") String nickname,
-            @Param("groupId") String groupId,
-            @Param("birthDate") LocalDate birthDate,
-            @Param("gender") String gender,
-            @Param("phone") String phone,
-            @Param("profileImage") String profileImage,
-            @Param("backgroundTheme") String backgroundTheme
-    );
+    void updateUserInfo(userRegisterRequest request);
 }

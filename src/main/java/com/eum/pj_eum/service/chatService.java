@@ -10,22 +10,20 @@ public interface chatService {
     /**
      * 일반 채팅 목록 조회
      */
-    List<chatListResponse> getChatList(String userId);
+    List<chatListResponse> getChatList(Long userId);
 
     /**
      * 새 채팅방 생성
      */
-    String createChatRoom(String userId);
+    Long createChatRoom(Long userId);
 
     /**
      * 채팅 메시지 저장
      */
-    String saveChatMessage(chatMessageSaveRequest request);
-
+    Long saveChatMessage(chatMessageSaveRequest request);
 
     /**
      * 채팅방 삭제
      */
-    void deleteChatRoom(String chatRoomId);
-
+    void deleteChatRoom(Long chatRoomId);
 }

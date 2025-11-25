@@ -8,8 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -19,75 +20,42 @@ public class chatServiceImpl implements chatService {
 
     /**
      * 일반 채팅 목록 조회
-     * 마지막 메시지 10글자 + ... 형태로 반환
      */
     @Override
-    public List<chatListResponse> getChatList(String userId) {
-        List<chatListResponse> chatList = chatMapper.selectChatList(userId);
-
-        // 마지막 메시지 미리보기 처리 (10글자 + ...)
-        for (chatListResponse chat : chatList) {
-            String lastMessage = chat.getLastMessage();
-            if (lastMessage != null && lastMessage.length() > 10) {
-                chat.setLastMessage(lastMessage.substring(0, 10) + "...");
-            }
-        }
-
-        return chatList;
+    public List<chatListResponse> getChatList(Long userId) {
+        return chatMapper.selectChatList(userId);
     }
 
     /**
-     * 새 채팅방 생성
+     * 새 채팅방 생성 (AUTO_INCREMENT)
      */
     @Override
     @Transactional
-    public String createChatRoom(String userId) {
-        String chatRoomId = UUID.randomUUID().toString();
+    public Long createChatRoom(Long userId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
 
-        chatMapper.insertChatRoom(chatRoomId, userId);
+        chatMapper.insertChatRoom(params);
 
-        return chatRoomId;
+        return (Long) params.get("chatRoomId");
     }
 
     /**
-     * 채팅 메시지 저장
+     * 채팅 메시지 저장 (AUTO_INCREMENT)
      */
     @Override
     @Transactional
-    public String saveChatMessage(chatMessageSaveRequest request) {
-        String messageId = UUID.randomUUID().toString();
-
-        // 현재 메시지 순서 조회
-        Integer currentSeq = chatMapper.selectMaxMessageSeq(request.getChatRoomId());
-        int nextSeq = (currentSeq == null) ? 1 : currentSeq + 1;
-
-        // 메시지 저장
-        chatMapper.insertChatMessage(
-                messageId,
-                request.getChatRoomId(),
-                request.getUserId(),
-                request.getMessageType(),
-                request.getMessageContent(),
-                nextSeq
-        );
-
-        // 채팅방 정보 업데이트 (마지막 메시지, 메시지 수)
-        chatMapper.updateChatRoomInfo(
-                request.getChatRoomId(),
-                request.getMessageContent()
-        );
-
-        return messageId;
+    public Long saveChatMessage(chatMessageSaveRequest request) {
+        chatMapper.insertChatMessage(request);
+        return request.getChatRoomId(); // messageId는 자동 생성됨
     }
-
 
     /**
      * 채팅방 삭제 (soft delete)
      */
     @Override
     @Transactional
-    public void deleteChatRoom(String chatRoomId) {
+    public void deleteChatRoom(Long chatRoomId) {
         chatMapper.updateChatRoomStatus(chatRoomId, "DELETED");
     }
-
 }

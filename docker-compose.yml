@@ -4,17 +4,17 @@ services:
   # MariaDB 데이터베이스
   mariadb:
     image: mariadb:10.11
-    container_name: eum-mariadb
+    container_name: eume-mariadb
     restart: always
     environment:
       # 루트 비밀번호
       MYSQL_ROOT_PASSWORD: root1234
       # 데이터베이스 이름
-      MYSQL_DATABASE: eum_db
+      MYSQL_DATABASE: eume_db
       # 사용자 계정
-      MYSQL_USER: eum_user
+      MYSQL_USER: eume_user
       # 사용자 비밀번호
-      MYSQL_PASSWORD: eum1234
+      MYSQL_PASSWORD: eume1234
       # 한글 설정
       TZ: Asia/Seoul
     ports:

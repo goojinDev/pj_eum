@@ -1,10 +1,12 @@
 package com.eum.pj_eum.mapper;
 
 import com.eum.pj_eum.dto.chatListResponse;
+import com.eum.pj_eum.dto.chatMessageSaveRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface chatMapper {
@@ -12,55 +14,26 @@ public interface chatMapper {
     /**
      * 일반 채팅 목록 조회
      */
-    List<chatListResponse> selectChatList(@Param("userId") String userId);
+    List<chatListResponse> selectChatList(@Param("userId") Long userId);
 
     /**
-     * 새 채팅방 생성
+     * 새 채팅방 생성 (AUTO_INCREMENT)
+     * Map으로 userId를 전달하고, chatRoomId는 자동 생성 후 Map에 담김
      */
-    void insertChatRoom(
-            @Param("chatRoomId") String chatRoomId,
-            @Param("userId") String userId
-    );
+    void insertChatRoom(Map<String, Object> params);
 
     /**
-     * 현재 채팅방의 최대 메시지 순서 조회
+     * 채팅 메시지 저장 (AUTO_INCREMENT)
      */
-    Integer selectMaxMessageSeq(@Param("chatRoomId") String chatRoomId);
-
-    /**
-     * 채팅 메시지 저장
-     */
-    void insertChatMessage(
-            @Param("messageId") String messageId,
-            @Param("chatRoomId") String chatRoomId,
-            @Param("userId") String userId,
-            @Param("messageType") String messageType,
-            @Param("messageContent") String messageContent,
-            @Param("messageSeq") int messageSeq
-    );
-
-    /**
-     * 채팅방 정보 업데이트 (마지막 메시지, 메시지 수)
-     */
-    void updateChatRoomInfo(
-            @Param("chatRoomId") String chatRoomId,
-            @Param("lastMessage") String lastMessage
-    );
+    void insertChatMessage(chatMessageSaveRequest request);
 
     /**
      * 채팅방 제목 수정
      */
-    void updateRoomTitle(
-            @Param("chatRoomId") String chatRoomId,
-            @Param("roomTitle") String roomTitle
-    );
+    void updateRoomTitle(@Param("chatRoomId") Long chatRoomId, @Param("roomTitle") String roomTitle);
 
     /**
      * 채팅방 상태 변경
      */
-    void updateChatRoomStatus(
-            @Param("chatRoomId") String chatRoomId,
-            @Param("roomStatus") String roomStatus
-    );
-
+    void updateChatRoomStatus(@Param("chatRoomId") Long chatRoomId, @Param("roomStatus") String roomStatus);
 }

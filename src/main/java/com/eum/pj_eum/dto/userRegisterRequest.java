@@ -5,14 +5,12 @@ import java.time.LocalDate;
 
 @Data
 public class userRegisterRequest {
-    private String userId;             // 추가 정보 입력 시 사용
+    private Long userId;               // 추가 정보 입력 시 사용 (AUTO_INCREMENT)
     private String email;              // 이메일
-    private String userPw;             // 비밀번호 (일반 회원가입용)
     private String userName;           // 이름
     private String nickname;           // 닉네임
-    private String loginType;          // 로그인 타입 (LOCAL, GOOGLE, KAKAO, NAVER)
     private String providerId;         // 소셜 로그인 제공자 ID
-    private String groupId;            // 소속 그룹 ID
+    private Long sigunguId;            // 시군구 ID (group_id → sigungu_id)
     private LocalDate birthDate;       // 생년월일
     private String gender;             // 성별
     private String phone;              // 전화번호

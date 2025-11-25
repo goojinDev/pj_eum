@@ -21,8 +21,8 @@ public class adminController {
 
     @Operation(summary = "관리자 회원가입", description = "새로운 관리자 계정을 생성합니다.")
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody adminRegisterRequest request) {
-        String adminId = adminService.register(request);
+    public ResponseEntity<Long> register(@RequestBody adminRegisterRequest request) {
+        Long adminId = adminService.register(request);
         return ResponseEntity.ok(adminId);
     }
 

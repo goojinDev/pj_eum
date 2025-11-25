@@ -11,17 +11,17 @@ public interface eumChatService {
     /**
      * 이음 채팅 목록 조회
      */
-    List<eumChatListResponse> getEumChatList(String userId);
+    List<eumChatListResponse> getEumChatList(Long userId);
 
     /**
-     * 오늘의 이음 채팅방 조회/생성
+     * 새 이음 채팅방 생성
      */
-    String getTodayEumChat(String userId);
+    Long createEumChat(Long userId);
 
     /**
      * 이음 채팅 메시지 저장
      */
-    String saveEumMessage(eumMessageSaveRequest request);
+    Long saveEumMessage(eumMessageSaveRequest request);
 
     /**
      * 감정 점수 저장
@@ -31,6 +31,5 @@ public interface eumChatService {
     /**
      * 이음 채팅 삭제
      */
-    void deleteEumChat(String eumChatId);
-
+    void deleteEumChat(Long eumeChatId);
 }

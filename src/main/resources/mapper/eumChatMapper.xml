@@ -5,159 +5,114 @@
 <mapper namespace="com.eum.pj_eum.mapper.eumChatMapper">
 
     <!-- 이음 채팅 목록 조회 -->
-    <select id="selectEumChatList" resultType="com.eum.pj_eum.dto.eumChatListResponse">
+    <select id="selectEumChatList" resultType="com.eum.pj_eum.dto.eumChatListResponse" parameterType="long">
         SELECT
-            ecl.eum_chat_id AS eumChatId,
+            ecl.eume_chat_id AS eumeChatId,
             ecl.user_id AS userId,
-            ecl.chat_date AS chatDate,
             ecl.chat_status AS chatStatus,
-            ecl.is_completed AS isCompleted,
-            ecl.message_count AS messageCount,
-            ecl.first_message_date AS firstMessageDate,
-            ecl.last_message_date AS lastMessageDate,
+            ecl.reg_date AS regDate,
+            ecl.upd_date AS updDate,
             (
                 SELECT ecc.message_content
-                FROM pj_eum_chat_content ecc
-                WHERE ecc.eum_chat_id = ecl.eum_chat_id
+                FROM eume_chat_content ecc
+                WHERE ecc.eume_chat_id = ecl.eume_chat_id
                   AND ecc.message_type = 'AI'
-                  AND ecc.is_deleted = 'N'
-                ORDER BY ecc.message_seq ASC
-                LIMIT 1
+                ORDER BY ecc.reg_date ASC
+                                LIMIT 1
             ) AS firstMessagePreview
-        FROM pj_eum_chat_list ecl
+        FROM eume_chat_list ecl
         WHERE ecl.user_id = #{userId}
           AND ecl.chat_status = 'ACTIVE'
-        ORDER BY ecl.chat_date DESC,
-            CASE WHEN ecl.last_message_date IS NULL THEN 1 ELSE 0 END,
-                 ecl.last_message_date DESC
+        ORDER BY ecl.upd_date DESC, ecl.reg_date DESC
     </select>
 
-    <!-- 오늘 날짜의 이음 채팅방 조회 -->
-    <select id="selectTodayEumChat" resultType="String">
-        SELECT eum_chat_id
-        FROM pj_eum_chat_list
-        WHERE user_id = #{userId}
-          AND chat_date = #{chatDate}
-          AND chat_status = 'ACTIVE'
-            LIMIT 1
-    </select>
-
-    <!-- 새 이음 채팅방 생성 -->
-    <insert id="insertEumChat">
-        INSERT INTO pj_eum_chat_list (
-            eum_chat_id,
+    <!-- 새 이음 채팅방 생성 (AUTO_INCREMENT 적용) -->
+    <insert id="insertEumChat" parameterType="map" useGeneratedKeys="true" keyProperty="eumeChatId">
+        INSERT INTO eume_chat_list (
             user_id,
-            chat_date,
-            chat_status,
-            is_completed,
-            message_count,
-            reg_date,
-            upd_date
+            chat_status
         ) VALUES (
-                     #{eumChatId},
                      #{userId},
-                     #{chatDate},
-                     'ACTIVE',
-                     'N',
-                     0,
-                     CURRENT_TIMESTAMP,
-                     CURRENT_TIMESTAMP
+                     'ACTIVE'
                  )
     </insert>
 
-    <!-- 현재 채팅방의 최대 메시지 순서 조회 -->
-    <select id="selectMaxMessageSeq" resultType="Integer">
-        SELECT MAX(message_seq)
-        FROM pj_eum_chat_content
-        WHERE eum_chat_id = #{eumChatId}
-          AND is_deleted = 'N'
-    </select>
-
-    <!-- 이음 채팅 메시지 저장 -->
-    <insert id="insertEumMessage">
-        INSERT INTO pj_eum_chat_content (
-            eum_message_id,
-            eum_chat_id,
+    <!-- 이음 채팅 메시지 저장 (AUTO_INCREMENT 적용) -->
+    <insert id="insertEumMessage" parameterType="com.eum.pj_eum.dto.eumMessageSaveRequest"
+            useGeneratedKeys="true" keyProperty="eumeMessageId">
+        INSERT INTO eume_chat_content (
+            eume_chat_id,
             user_id,
             message_type,
-            message_content,
-            message_seq,
-            question_type,
-            is_deleted,
-            reg_date
+            message_content
         ) VALUES (
-                     #{messageId},
-                     #{eumChatId},
+                     #{eumeChatId},
                      #{userId},
                      #{messageType},
-                     #{messageContent},
-                     #{messageSeq},
-                     #{questionType},
-                     'N',
-                     CURRENT_TIMESTAMP
+                     #{messageContent}
                  )
     </insert>
 
-    <!-- 채팅방 정보 업데이트 -->
-    <update id="updateEumChatInfo">
-        UPDATE pj_eum_chat_list
-        SET message_count = (
-            SELECT COUNT(*)
-            FROM pj_eum_chat_content
-            WHERE eum_chat_id = #{eumChatId}
-              AND is_deleted = 'N'
-        ),
-            last_message_date = (
-                SELECT MAX(reg_date)
-                FROM pj_eum_chat_content
-                WHERE eum_chat_id = #{eumChatId}
-                  AND is_deleted = 'N'
-            ),
-            first_message_date = COALESCE(first_message_date, (
-                SELECT MIN(reg_date)
-                FROM pj_eum_chat_content
-                WHERE eum_chat_id = #{eumChatId}
-                  AND is_deleted = 'N'
-            )),
-            upd_date = CURRENT_TIMESTAMP
-        WHERE eum_chat_id = #{eumChatId}
-    </update>
+    <!-- 특정 이음 채팅방의 메시지 목록 조회 -->
+    <select id="selectEumMessages" resultType="com.eum.pj_eum.dto.eumChatMessageResponse" parameterType="long">
+        SELECT
+            eume_message_id AS eumeMessageId,
+            eume_chat_id AS eumeChatId,
+            user_id AS userId,
+            message_type AS messageType,
+            message_content AS messageContent,
+            reg_date AS regDate
+        FROM eume_chat_content
+        WHERE eume_chat_id = #{eumeChatId}
+        ORDER BY reg_date ASC
+    </select>
 
-    <!-- 감정 점수 저장 -->
-    <insert id="insertEmotionScore">
-        INSERT INTO pj_user_emotion (
-            emotion_id,
-            message_id,
-            eum_message_id,
+    <!-- 감정 점수 저장 (AUTO_INCREMENT 적용) -->
+    <insert id="insertEmotionScore" parameterType="com.eum.pj_eum.dto.emotionScoreSaveRequest"
+            useGeneratedKeys="true" keyProperty="emotionId">
+        INSERT INTO user_emotion (
             user_id,
-            emotion_type,
+            depression_score,
+            anxiety_score,
+            stress_score,
             emotion_score,
-            sentiment,
-            sentiment_score,
             keywords,
-            analysis_date,
             model_version
         ) VALUES (
-                     #{emotionId},
-                     #{messageId},
-                     #{eumMessageId},
                      #{userId},
-                     #{emotionType},
+                     #{depressionScore},
+                     #{anxietyScore},
+                     #{stressScore},
                      #{emotionScore},
-                     #{sentiment},
-                     #{sentimentScore},
                      #{keywords},
-                     CURRENT_TIMESTAMP,
                      #{modelVersion}
                  )
     </insert>
 
     <!-- 이음 채팅 상태 변경 -->
     <update id="updateEumChatStatus">
-        UPDATE pj_eum_chat_list
+        UPDATE eume_chat_list
         SET chat_status = #{chatStatus},
             upd_date = CURRENT_TIMESTAMP
-        WHERE eum_chat_id = #{eumChatId}
+        WHERE eume_chat_id = #{eumeChatId}
     </update>
+
+    <!-- 사용자의 최근 감정 분석 결과 조회 -->
+    <select id="selectRecentEmotion" resultType="com.eum.pj_eum.dto.emotionResponse" parameterType="long">
+        SELECT
+            emotion_id AS emotionId,
+            user_id AS userId,
+            depression_score AS depressionScore,
+            anxiety_score AS anxietyScore,
+            stress_score AS stressScore,
+            emotion_score AS emotionScore,
+            keywords,
+            analysis_date AS analysisDate,
+            model_version AS modelVersion
+        FROM user_emotion
+        WHERE user_id = #{userId}
+        ORDER BY analysis_date DESC
+            LIMIT 1
+    </select>
 
 </mapper>

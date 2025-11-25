@@ -10,5 +10,5 @@ public class adminRegisterRequest {
     private String adminName;          // 이름
     private String adminEmail;         // 이메일
     private String adminPhone;         // 전화번호
-    private String groupId;            // 소속 그룹 ID
+    private Long sigunguId;            // 시군구 ID (group_id → sigungu_id)
 }

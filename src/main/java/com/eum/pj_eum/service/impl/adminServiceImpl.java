@@ -1,5 +1,6 @@
 package com.eum.pj_eum.service.impl;
 
+import com.eum.pj_eum.config.jwtTokenProvider;
 import com.eum.pj_eum.dto.adminRegisterRequest;
 import com.eum.pj_eum.dto.adminVO;
 import com.eum.pj_eum.dto.loginRequest;
@@ -12,18 +13,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class adminServiceImpl implements adminService {
 
     private final adminMapper adminMapper;
     private final PasswordEncoder passwordEncoder;
+    private final jwtTokenProvider jwtTokenProvider;
 
     @Override
     @Transactional
-    public String register(adminRegisterRequest request) {
+    public Long register(adminRegisterRequest request) {
         // 1. 로그인 ID 중복 확인
         adminVO existingAdmin = adminMapper.findByLoginId(request.getAdminLoginId());
         if (existingAdmin != null) {
@@ -39,25 +39,21 @@ public class adminServiceImpl implements adminService {
         // 3. 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(request.getAdminPw());
 
-        // 4. 관리자 ID 생성 (UUID)
-        String adminId = "ADMIN-" + UUID.randomUUID().toString();
-
-        // 5. VO 생성
+        // 4. VO 생성 (ID는 AUTO_INCREMENT)
         adminVO admin = new adminVO();
-        admin.setAdminId(adminId);
         admin.setAdminLoginId(request.getAdminLoginId());
         admin.setAdminPw(encodedPassword);
         admin.setAdminName(request.getAdminName());
         admin.setAdminEmail(request.getAdminEmail());
         admin.setAdminPhone(request.getAdminPhone());
-        admin.setGroupId(request.getGroupId());
+        admin.setSigunguId(request.getSigunguId());
         admin.setAdminStatus("ACTIVE");
         admin.setLoginFailCount(0);
 
-        // 6. DB 저장
+        // 5. DB 저장 (INSERT 후 adminId 자동 생성)
         adminMapper.insert(admin);
 
-        return adminId;
+        return admin.getAdminId();
     }
 
     @Override
@@ -88,14 +84,19 @@ public class adminServiceImpl implements adminService {
         adminMapper.updateLastLoginDate(admin.getAdminId());
         adminMapper.resetLoginFailCount(admin.getAdminId());
 
-        // 6. 응답 생성
+        // 6. JWT 토큰 생성
+        String token = jwtTokenProvider.createToken(admin.getAdminId(), "ADMIN");
+
+        // 7. 응답 생성
         loginResponse response = new loginResponse();
         response.setUserId(admin.getAdminId());
         response.setLoginId(admin.getAdminLoginId());
         response.setName(admin.getAdminName());
         response.setEmail(admin.getAdminEmail());
+        response.setSigunguId(admin.getSigunguId());
         response.setFirstLogin(firstLogin);
-        response.setToken("TEMP_TOKEN"); // JWT 토큰 추후 구현
+        response.setToken(token);
+        response.setUserType("ADMIN");
 
         return response;
     }

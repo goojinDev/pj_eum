@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class todayMoodRequest {
 
-    private String userId;          // 사용자 ID
+    private Long userId;            // 사용자 ID (AUTO_INCREMENT)
     private String moodLevel;       // 기분 레벨 (GOOD, NORMAL, BAD, TIRED)
     private Integer moodScore;      // 기분 점수 (0-100)
-
 }

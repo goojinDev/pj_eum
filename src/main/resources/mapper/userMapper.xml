@@ -8,19 +8,15 @@
     <resultMap id="userVoMap" type="com.eum.pj_eum.dto.userVo">
         <id property="userId" column="user_id"/>
         <result property="email" column="email"/>
-        <result property="userPw" column="user_pw"/>
         <result property="userName" column="user_name"/>
         <result property="nickname" column="nickname"/>
         <result property="profileImage" column="profile_image"/>
-        <result property="loginType" column="login_type"/>
         <result property="providerId" column="provider_id"/>
-        <result property="userRole" column="user_role"/>
         <result property="userStatus" column="user_status"/>
-        <result property="groupId" column="group_id"/>
+        <result property="sigunguId" column="sigungu_id"/>
         <result property="birthDate" column="birth_date"/>
         <result property="gender" column="gender"/>
         <result property="phone" column="phone"/>
-        <result property="emailVerified" column="email_verified"/>
         <result property="backgroundTheme" column="background_theme"/>
         <result property="lastLoginDate" column="last_login_date"/>
         <result property="loginFailCount" column="login_fail_count"/>
@@ -28,80 +24,70 @@
         <result property="updDate" column="upd_date"/>
     </resultMap>
 
-    <!-- 사용자 등록 -->
-    <insert id="insert">
-        INSERT INTO pj_user (
-            user_id, email, user_pw, user_name, nickname,
-            profile_image, login_type, provider_id, user_role,
-            user_status, group_id, birth_date, gender, phone,
-            email_verified, background_theme, login_fail_count,
-            reg_date, upd_date
+    <!-- 사용자 등록 (AUTO_INCREMENT 적용) -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO eume_user (
+            email, user_name, nickname,
+            profile_image, provider_id,
+            user_status, sigungu_id, birth_date, gender, phone,
+            background_theme, login_fail_count
         ) VALUES (
-                     #{userId}, #{email}, #{userPw}, #{userName}, #{nickname},
-                     #{profileImage}, #{loginType}, #{providerId}, #{userRole},
-                     #{userStatus}, #{groupId}, #{birthDate}, #{gender}, #{phone},
-                     #{emailVerified}, #{backgroundTheme}, #{loginFailCount},
-                     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                     #{email}, #{userName}, #{nickname},
+                     #{profileImage}, #{providerId},
+                     #{userStatus}, #{sigunguId}, #{birthDate}, #{gender}, #{phone},
+                     #{backgroundTheme}, #{loginFailCount}
                  )
     </insert>
 
     <!-- 이메일로 사용자 조회 -->
     <select id="findByEmail" resultMap="userVoMap">
-        SELECT user_id, email, user_pw, user_name, nickname,
-               profile_image, login_type, provider_id, user_role,
-               user_status, group_id, birth_date, gender, phone,
-               email_verified, background_theme, last_login_date,
+        SELECT user_id, email, user_name, nickname,
+               profile_image, provider_id,
+               user_status, sigungu_id, birth_date, gender, phone,
+               background_theme, last_login_date,
                login_fail_count, reg_date, upd_date
-        FROM pj_user
+        FROM eume_user
         WHERE email = #{email}
     </select>
 
     <!-- 사용자 ID로 조회 -->
-    <select id="findById" resultMap="userVoMap">
-        SELECT user_id, email, user_pw, user_name, nickname,
-               profile_image, login_type, provider_id, user_role,
-               user_status, group_id, birth_date, gender, phone,
-               email_verified, background_theme, last_login_date,
+    <select id="findById" resultMap="userVoMap" parameterType="long">
+        SELECT user_id, email, user_name, nickname,
+               profile_image, provider_id,
+               user_status, sigungu_id, birth_date, gender, phone,
+               background_theme, last_login_date,
                login_fail_count, reg_date, upd_date
-        FROM pj_user
+        FROM eume_user
         WHERE user_id = #{userId}
     </select>
 
     <!-- 마지막 로그인 시간 업데이트 -->
-    <update id="updateLastLoginDate">
-        UPDATE pj_user
+    <update id="updateLastLoginDate" parameterType="long">
+        UPDATE eume_user
         SET last_login_date = CURRENT_TIMESTAMP,
             upd_date = CURRENT_TIMESTAMP
         WHERE user_id = #{userId}
     </update>
 
     <!-- 로그인 실패 횟수 증가 -->
-    <update id="increaseLoginFailCount">
-        UPDATE pj_user
+    <update id="increaseLoginFailCount" parameterType="long">
+        UPDATE eume_user
         SET login_fail_count = login_fail_count + 1,
             upd_date = CURRENT_TIMESTAMP
         WHERE user_id = #{userId}
     </update>
 
     <!-- 로그인 실패 횟수 초기화 -->
-    <update id="resetLoginFailCount">
-        UPDATE pj_user
+    <update id="resetLoginFailCount" parameterType="long">
+        UPDATE eume_user
         SET login_fail_count = 0,
-            upd_date = CURRENT_TIMESTAMP
-        WHERE user_id = #{userId}
-    </update>
-
-    <!-- 비밀번호 변경 -->
-    <update id="updatePassword">
-        UPDATE pj_user
-        SET user_pw = #{userPw},
             upd_date = CURRENT_TIMESTAMP
         WHERE user_id = #{userId}
     </update>
 
     <!-- 사용자 상태 변경 -->
     <update id="updateStatus">
-        UPDATE pj_user
+        UPDATE eume_user
         SET user_status = #{userStatus},
             upd_date = CURRENT_TIMESTAMP
         WHERE user_id = #{userId}
@@ -109,31 +95,18 @@
 
     <!-- 프로필 이미지 업데이트 -->
     <update id="updateProfileImage">
-        UPDATE pj_user
+        UPDATE eume_user
         SET profile_image = #{profileImage},
             upd_date = CURRENT_TIMESTAMP
         WHERE user_id = #{userId}
     </update>
 
-    <!-- 추가 정보 업데이트 -->
-    <update id="updateAdditionalInfo">
-        UPDATE pj_user
-        SET nickname = #{nickname},
-            group_id = #{groupId},
-            birth_date = #{birthDate},
-            gender = #{gender},
-            phone = #{phone},
-            background_theme = #{backgroundTheme},
-            upd_date = CURRENT_TIMESTAMP
-        WHERE user_id = #{userId}
-    </update>
-
     <!-- 사용자 정보 업데이트 -->
-    <update id="updateUserInfo">
-        UPDATE pj_user
+    <update id="updateUserInfo" parameterType="com.eum.pj_eum.dto.userRegisterRequest">
+        UPDATE eume_user
         <set>
             <if test="nickname != null">nickname = #{nickname},</if>
-            <if test="groupId != null">group_id = #{groupId},</if>
+            <if test="sigunguId != null">sigungu_id = #{sigunguId},</if>
             <if test="birthDate != null">birth_date = #{birthDate},</if>
             <if test="gender != null">gender = #{gender},</if>
             <if test="phone != null">phone = #{phone},</if>

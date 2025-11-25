@@ -20,9 +20,9 @@ public class chatController {
     private final chatService chatService;
 
     @Operation(summary = "일반 채팅 목록 조회",
-            description = "사용자의 일반 채팅 목록을 조회합니다. 마지막 메시지 10글자 + ... 형태로 표시")
+            description = "사용자의 일반 채팅 목록을 조회합니다.")
     @GetMapping("/list/{userId}")
-    public ResponseEntity<List<chatListResponse>> getChatList(@PathVariable String userId) {
+    public ResponseEntity<List<chatListResponse>> getChatList(@PathVariable Long userId) {
         List<chatListResponse> chatList = chatService.getChatList(userId);
         return ResponseEntity.ok(chatList);
     }
@@ -30,26 +30,24 @@ public class chatController {
     @Operation(summary = "새 채팅방 생성",
             description = "새로운 일반 채팅방을 생성합니다.")
     @PostMapping("/create/{userId}")
-    public ResponseEntity<String> createChatRoom(@PathVariable String userId) {
-        String chatRoomId = chatService.createChatRoom(userId);
+    public ResponseEntity<Long> createChatRoom(@PathVariable Long userId) {
+        Long chatRoomId = chatService.createChatRoom(userId);
         return ResponseEntity.ok(chatRoomId);
     }
 
     @Operation(summary = "채팅 메시지 저장",
             description = "사용자 질문 또는 AI 답변을 저장합니다.")
     @PostMapping("/message")
-    public ResponseEntity<String> saveChatMessage(@RequestBody chatMessageSaveRequest request) {
-        String messageId = chatService.saveChatMessage(request);
+    public ResponseEntity<Long> saveChatMessage(@RequestBody chatMessageSaveRequest request) {
+        Long messageId = chatService.saveChatMessage(request);
         return ResponseEntity.ok(messageId);
     }
-
 
     @Operation(summary = "채팅방 삭제",
             description = "채팅방을 삭제합니다. (soft delete)")
     @DeleteMapping("/{chatRoomId}")
-    public ResponseEntity<String> deleteChatRoom(@PathVariable String chatRoomId) {
+    public ResponseEntity<String> deleteChatRoom(@PathVariable Long chatRoomId) {
         chatService.deleteChatRoom(chatRoomId);
         return ResponseEntity.ok("채팅방이 삭제되었습니다.");
     }
-
 }

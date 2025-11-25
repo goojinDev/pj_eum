@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class chatMessageSaveRequest {
 
-    private String chatRoomId;      // 채팅방 ID
-    private String userId;          // 사용자 ID
+    private Long chatRoomId;        // 채팅방 ID (AUTO_INCREMENT)
+    private Long userId;            // 사용자 ID
     private String messageType;     // 메시지 타입 (AI/USER)
     private String messageContent;  // 메시지 내용
-
 }

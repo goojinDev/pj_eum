@@ -13,72 +13,72 @@
         <result property="adminEmail" column="admin_email"/>
         <result property="adminPhone" column="admin_phone"/>
         <result property="adminStatus" column="admin_status"/>
-        <result property="groupId" column="group_id"/>
+        <result property="sigunguId" column="sigungu_id"/>
         <result property="lastLoginDate" column="last_login_date"/>
         <result property="loginFailCount" column="login_fail_count"/>
         <result property="regDate" column="reg_date"/>
         <result property="updDate" column="upd_date"/>
     </resultMap>
 
-    <!-- 관리자 등록 -->
-    <insert id="insert">
-        INSERT INTO pj_admin (
-            admin_id, admin_login_id, admin_pw, admin_name,
-            admin_email, admin_phone, admin_status, group_id,
-            login_fail_count, reg_date, upd_date
+    <!-- 관리자 등록 (AUTO_INCREMENT 적용) -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="adminId">
+        INSERT INTO eume_admin (
+            admin_login_id, admin_pw, admin_name,
+            admin_email, admin_phone, admin_status, sigungu_id,
+            login_fail_count
         ) VALUES (
-                     #{adminId}, #{adminLoginId}, #{adminPw}, #{adminName},
-                     #{adminEmail}, #{adminPhone}, #{adminStatus}, #{groupId},
-                     #{loginFailCount}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                     #{adminLoginId}, #{adminPw}, #{adminName},
+                     #{adminEmail}, #{adminPhone}, #{adminStatus}, #{sigunguId},
+                     #{loginFailCount}
                  )
     </insert>
 
     <!-- 로그인 ID로 관리자 조회 -->
     <select id="findByLoginId" resultMap="adminVOMap">
         SELECT admin_id, admin_login_id, admin_pw, admin_name, admin_email,
-               admin_phone, admin_status, group_id, last_login_date,
+               admin_phone, admin_status, sigungu_id, last_login_date,
                login_fail_count, reg_date, upd_date
-        FROM pj_admin
+        FROM eume_admin
         WHERE admin_login_id = #{adminLoginId}
     </select>
 
     <!-- 이메일로 관리자 조회 -->
     <select id="findByEmail" resultMap="adminVOMap">
         SELECT admin_id, admin_login_id, admin_pw, admin_name, admin_email,
-               admin_phone, admin_status, group_id, last_login_date,
+               admin_phone, admin_status, sigungu_id, last_login_date,
                login_fail_count, reg_date, upd_date
-        FROM pj_admin
+        FROM eume_admin
         WHERE admin_email = #{adminEmail}
     </select>
 
     <!-- 관리자 ID로 조회 -->
-    <select id="findById" resultMap="adminVOMap">
+    <select id="findById" resultMap="adminVOMap" parameterType="long">
         SELECT admin_id, admin_login_id, admin_pw, admin_name, admin_email,
-               admin_phone, admin_status, group_id, last_login_date,
+               admin_phone, admin_status, sigungu_id, last_login_date,
                login_fail_count, reg_date, upd_date
-        FROM pj_admin
+        FROM eume_admin
         WHERE admin_id = #{adminId}
     </select>
 
     <!-- 마지막 로그인 시간 업데이트 -->
-    <update id="updateLastLoginDate">
-        UPDATE pj_admin
+    <update id="updateLastLoginDate" parameterType="long">
+        UPDATE eume_admin
         SET last_login_date = CURRENT_TIMESTAMP,
             upd_date = CURRENT_TIMESTAMP
         WHERE admin_id = #{adminId}
     </update>
 
     <!-- 로그인 실패 횟수 증가 -->
-    <update id="increaseLoginFailCount">
-        UPDATE pj_admin
+    <update id="increaseLoginFailCount" parameterType="long">
+        UPDATE eume_admin
         SET login_fail_count = login_fail_count + 1,
             upd_date = CURRENT_TIMESTAMP
         WHERE admin_id = #{adminId}
     </update>
 
     <!-- 로그인 실패 횟수 초기화 -->
-    <update id="resetLoginFailCount">
-        UPDATE pj_admin
+    <update id="resetLoginFailCount" parameterType="long">
+        UPDATE eume_admin
         SET login_fail_count = 0,
             upd_date = CURRENT_TIMESTAMP
         WHERE admin_id = #{adminId}
@@ -86,7 +86,7 @@
 
     <!-- 비밀번호 변경 -->
     <update id="updatePassword">
-        UPDATE pj_admin
+        UPDATE eume_admin
         SET admin_pw = #{adminPw},
             upd_date = CURRENT_TIMESTAMP
         WHERE admin_id = #{adminId}
